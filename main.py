@@ -103,4 +103,69 @@ validation_generator =  test_datagen.flow_from_directory(validation_dir,
                                                          batch_size=32,
                                                          class_mode  = 'binary',
                                                          target_size = (150, 150))
+history = model.fit(train_generator,
+                              validation_data=validation_generator,
+                              steps_per_epoch=100,
+                              epochs=30,
+                              validation_steps=50,
+                              verbose=2)
+
+acc = history.history['accuracy' ]
+val_acc  = history.history[ 'val_accuracy' ]
+loss = history.history['loss' ]
+val_loss = history.history['val_loss' ]
+
+epochs   = range(len(acc))
+
+plt.plot  ( epochs,     acc )
+plt.plot  ( epochs, val_acc )
+plt.title ('Training and validation accuracy')
+plt.figure()
+
+
+plt.plot  ( epochs,     loss )
+plt.plot  ( epochs, val_loss )
+plt.title ('Training and validation loss'   )
+plt.show()
+
+uploaded='Testing'
+
+with open('Test.csv', 'r') as t2:
+    filetwo = t2.readlines()
+Y_True= []
+for i in range(190):
+    Y_True.append(filetwo[i][-1])
+    print(filetwo[i][-2])
+
+
+
+Y_Predicted = []
+with open('Result.csv', 'w',newline='') as file:
+    fieldnames = ['Picture', 'Title']
+    dictWriter = csv.DictWriter(file, fieldnames=fieldnames)
+    dictWriter.writeheader()
+    for i in range(190):
+        path = ('Testing\\' + str(i) + '.jpg')
+        img=image.load_img(path, target_size=(150, 150))
+  
+        x=image.img_to_array(img)
+        x=np.expand_dims(x, axis=0)
+        images = np.vstack([x])
+  
+        classes = model.predict(images, batch_size=10)
+  
+        print(classes[0])
+  
+        if classes[0]>0:
+            print(str(i) + " is a dog")
+            
+            Y_Predicted.append(str(1))
+            dictWriter.writerow({'Picture': str(i) + '.jpg', 'Title': str(1)})
+    
+        else:
+            print(str(i) + " is a cat")
+            Y_Predicted.append(str(0))
+            dictWriter.writerow({'Picture': str(i) + '.jpg', 'Title': str(0)})
+  
+
 
